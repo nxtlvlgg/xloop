@@ -1,6 +1,4 @@
 var async = require("async");
-var util = require("util");
-var loopback = require("loopback");
 
 
 function crawlResult(Model, mixinOptions, ctx, modelInstance, finalCb) {
@@ -29,7 +27,9 @@ function crawlResult(Model, mixinOptions, ctx, modelInstance, finalCb) {
     if(modelInstance && Array.isArray(modelInstance)) {
         return async.each(ctx.result, function(instance, eachCb) {
             parentState.requestData = parentState.data = instance["__data"];
-            return crawlContainer("object", parentState, mixinOptions, eachCb);
+            async.setImmediate(function () {
+                return crawlContainer("object", parentState, mixinOptions, eachCb);
+            });
         }, doneCrawling);
 
     // Process Single Results

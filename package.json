@@ -17,8 +17,6 @@
   },
   "homepage": "https://github.com/nxtlvlgg/xloop#readme",
   "dependencies": {
-    "async": "^2.0.0-rc.2",
-    "loopback": "^2.27.0",
-    "underscore": "^1.8.3"
+    "async": "^2.0.0-rc.2"
   }
 }
