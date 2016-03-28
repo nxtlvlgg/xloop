@@ -13,7 +13,7 @@ function generateBootOptions(app, options, finalCb) {
     };
 
     // Get the root app directory
-    var appDir = path.join(__dirname, "..", "server");
+    var appDir = path.join(__dirname, "..", "..", "server");
     var configsPath = path.join(appDir, "configs");
 
     // Add default loopback directories
