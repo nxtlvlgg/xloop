@@ -34,8 +34,7 @@ function generateBootOptions(app, options, finalCb) {
 
         // check for modules folder
         function (seriesCb) {
-            var rootDirPath = path.join(__dirname, "..", "..", "..", "..");
-            var modulePath = path.join(rootDirPath, "modules");
+            var modulePath = path.join(appDir, "..", "modules");
             return fs.open(modulePath, 'r', function (err, fd) {
                 if (err && err.code == 'ENOENT') {
                     return seriesCb(true);
