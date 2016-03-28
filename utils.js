@@ -1,6 +1,3 @@
-var _ = require("underscore");
-var loopback = require("loopback");
-var async = require("async");
 
 var ID_SUFFIX = "Id";
 
@@ -61,5 +58,5 @@ function getFirstForeignKey(data) {
 module.exports = {
     getRandomInt : getRandomInt,
     convertMillisecondsToDigitalClock : convertMillisecondsToDigitalClock,
-    modelNameFromForeignKey: modelNameFromForeignKey,
+    modelNameFromForeignKey: modelNameFromForeignKey
 };
