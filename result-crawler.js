@@ -70,6 +70,13 @@ function buildNextState(value, key, oldState, mixinOptions) {
     newState.data = (newState.parentData) ? oldState.data[key] : undefined;
     newState.currentInstance = (!oldState.currentInstance) ? undefined : oldState.currentInstance[key];
 
+    // Attach ctx specific vars to state obj
+    for(var key in mixinOptions.stateVars) {
+        if(oldState[key] !== undefined) {
+            newState[key] = oldState[key];
+        }
+    }
+
     // Build new root key
     var rootKeyPrefix = (oldState.rootKey.length < 1) ? "" : oldState.rootKey + ".";
     newState.rootKey = rootKeyPrefix + key;
