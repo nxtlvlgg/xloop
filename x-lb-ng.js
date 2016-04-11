@@ -4,9 +4,11 @@ var fs = require('fs');
 var path = require('path');
 var semver = require('semver');
 var generator = require('loopback-sdk-angular');
+var mkdirp = require('mkdirp');
 
 var appFile = path.join(__dirname, "..", "..", "server", "server.js");
 var outputFile = path.join(__dirname, "..", "..", "client", "dist", "js", "services", "lb-services.js");
+var outputDir = path.dirname(outputFile);
 
 console.error('Loading LoopBack app %j', appFile);
 var app = require(appFile);
@@ -22,22 +24,24 @@ function runGenerator() {
     console.error('Generating %j for the API endpoint %j', ngModuleName, apiUrl);
     var result = generator.services(app, ngModuleName, apiUrl);
 
-    if (!fs.existsSync(outputFile)){
-        fs.mkdirSync(outputFile);
-    }
+    // Ensure director
+    console.log("output dir", outputDir);
+    return mkdirp(outputDir, function (err) {
+        if (err) return console.log(err);
 
-    outputFile = path.resolve(outputFile);
-    console.error('Saving the generated services source to %j', outputFile);
-    fs.writeFileSync(outputFile, result);
+        outputFile = path.resolve(outputFile);
+        console.error('Saving the generated services source to %j', outputFile);
+        fs.writeFileSync(outputFile, result);
 
-    // The app.js scaffolded by `slc lb project` loads strong-agent module that
-    // used to have a bug where it prevented the application from exiting.
-    // To work around that issue, we are explicitly exiting here.
-    //
-    // The exit is deferred to the next tick in order to prevent the Node bug:
-    // https://github.com/joyent/node/issues/3584
-    process.nextTick(function() {
-        process.exit();
+        // The app.js scaffolded by `slc lb project` loads strong-agent module that
+        // used to have a bug where it prevented the application from exiting.
+        // To work around that issue, we are explicitly exiting here.
+        //
+        // The exit is deferred to the next tick in order to prevent the Node bug:
+        // https://github.com/joyent/node/issues/3584
+        return process.nextTick(function() {
+            process.exit();
+        });
     });
 }
 
