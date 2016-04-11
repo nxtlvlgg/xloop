@@ -25,7 +25,6 @@ function runGenerator() {
     var result = generator.services(app, ngModuleName, apiUrl);
 
     // Ensure director
-    console.log("output dir", outputDir);
     return mkdirp(outputDir, function (err) {
         if (err) return console.log(err);
 
