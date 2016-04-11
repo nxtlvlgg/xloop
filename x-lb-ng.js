@@ -22,14 +22,13 @@ function runGenerator() {
     console.error('Generating %j for the API endpoint %j', ngModuleName, apiUrl);
     var result = generator.services(app, ngModuleName, apiUrl);
 
-    if (outputFile) {
-        outputFile = path.resolve(outputFile);
-        console.error('Saving the generated services source to %j', outputFile);
-        fs.writeFileSync(outputFile, result);
-    } else {
-        console.error('Dumping to stdout');
-        process.stdout.write(result);
+    if (!fs.existsSync(outputFile)){
+        fs.mkdirSync(outputFile);
     }
+
+    outputFile = path.resolve(outputFile);
+    console.error('Saving the generated services source to %j', outputFile);
+    fs.writeFileSync(outputFile, result);
 
     // The app.js scaffolded by `slc lb project` loads strong-agent module that
     // used to have a bug where it prevented the application from exiting.
