@@ -55,16 +55,20 @@ function getFirstForeignKey(data) {
 
 
 function getModelFromRemoteMethod(parentModel, methodName) {
+
     var methodArr = methodName.split("__");
-    var modelName;
-    if (methodArr.length > 1) {
-        var relationName = methodArr[methodArr.length - 1];
-        var relationConfig = parentModel.settings.relations[relationName]
-            || parentModel.relations[relationName];
-        modelName = relationConfig.model
+    if (methodArr.length < 2) {
+        return parentModel;
     }
+
+    var relationName = methodArr[methodArr.length - 1];
+    var relationConfig = parentModel.settings.relations[relationName]
+        || parentModel.relations[relationName];
+    var modelName = relationConfig.model;
+
     return parentModel.app.models[modelName];
 }
+
 
 function getOptionForModelRelation(Model, relationName, optionName) {
     if(Model.relations[relationName].options[optionName] !== undefined
