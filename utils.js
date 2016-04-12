@@ -54,9 +54,36 @@ function getFirstForeignKey(data) {
 }
 
 
+function getModelFromRemoteMethod(Model, methodName) {
+    var methodArr = methodName.split("__");
+    if (methodArr.length > 1) {
+        var relationName = methodArr[methodArr.length - 1];
+        var relationConfig = Model.settings.relations[relationName]
+            || Model.relations[relationName];
+        modelName = relationConfig.model
+    }
+    ctx.Model = Model.app.models[modelName];
+}
+
+function getOptionForModelRelation(Model, relationName, optionName) {
+    if(Model.relations[relationName].options[optionName] !== undefined
+        || Model.relations[relationName].options[optionName] !== null) {
+        return Model.relations[relationName].options[optionName]
+    }
+
+    if(!Model.settings.relations[relationName]) {
+        return;
+    }
+
+    return Model.settings.relations[relationName][optionName];
+}
+
+
 
 module.exports = {
     getRandomInt : getRandomInt,
     convertMillisecondsToDigitalClock : convertMillisecondsToDigitalClock,
-    modelNameFromForeignKey: modelNameFromForeignKey
+    modelNameFromForeignKey: modelNameFromForeignKey,
+    getModelFromRemoteMethod: getModelFromRemoteMethod,
+    getOptionForModelRelation: getOptionForModelRelation
 };
