@@ -72,7 +72,7 @@ function getModelFromRemoteMethod(parentModel, methodName) {
 
 function getOptionForModelRelation(Model, relationName, optionName) {
     if(Model.relations[relationName].options[optionName] !== undefined
-        || Model.relations[relationName].options[optionName] !== null) {
+        && Model.relations[relationName].options[optionName] !== null) {
         return Model.relations[relationName].options[optionName]
     }
 
