@@ -26,8 +26,8 @@ function crawlResult(Model, mixinOptions, ctx, modelInstance, finalCb) {
     // Process array of results
     if(modelInstance && Array.isArray(modelInstance)) {
         return async.each(ctx.result, function(instance, eachCb) {
-            parentState.requestData = parentState.data = instance["__data"];
             async.setImmediate(function () {
+                parentState.requestData = parentState.data = instance["__data"];
                 return crawlContainer("object", parentState, mixinOptions, eachCb);
             });
         }, doneCrawling);
