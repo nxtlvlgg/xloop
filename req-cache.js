@@ -1,15 +1,15 @@
 var loopback = require("loopback");
-
+var LoopBackContext = require('loopback-context');
 
 function setRequest(ctx) {
-    loopback.getCurrentContext().set('req', ctx.req);
+    var currentContext = LoopBackContext.getCurrentContext();
+    currentContext.set('req', ctx.req);
 }
 
 function getRequest() {
-    var loopbackContext = loopback.getCurrentContext();
     var req;
-    if (loopbackContext) {
-        req = loopbackContext.get("req");
+    if (LoopBackContext) {
+        req = LoopBackContext.get("req");
     }
 
     return req || {};
