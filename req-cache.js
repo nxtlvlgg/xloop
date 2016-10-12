@@ -7,9 +7,10 @@ function setRequest(ctx) {
 }
 
 function getRequest() {
+    var currentContext = LoopBackContext.getCurrentContext();
     var req;
-    if (LoopBackContext) {
-        req = LoopBackContext.get("req");
+    if (currentContext) {
+        req = currentContext.get("req");
     }
 
     return req || {};
