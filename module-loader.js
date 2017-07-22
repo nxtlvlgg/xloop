@@ -35,99 +35,85 @@ function generateBootOptions(app, options, finalCb) {
         // check for modules folder
         function (seriesCb) {
             var modulePath = path.join(appDir, "..", "modules");
-            return fs.open(modulePath, 'r', function (err, fd) {
-                if (err && err.code == 'ENOENT') {
-                    return seriesCb(true);
-                } else if(err) return seriesCb(err);
-                return seriesCb(undefined, modulePath);
-            });
+            var file = fs.openSync(modulePath, 'r');
+            var stats = fs.fstatSync(file);
+
+            if (!stats.isDirectory()) {
+                return seriesCb(true);
+            }
+
+            return seriesCb(undefined, modulePath);
         },
         // Iterate over modules folder
         function (modulesPath, seriesCb) {
             return crawlModulesDir(modulesPath, seriesCb);
         }
     ],
-    function (err) {
-        if (err && err !== true) {
-            return finalCb(err);
-        }
+        function (err) {
+            if (err && err !== true) {
+                return finalCb(err);
+            }
 
-        return finalCb(undefined, loopbackBootOptions);
-    });
+            return finalCb(undefined, loopbackBootOptions);
+        });
 
     function crawlModulesDir(modulesPath, modulesCb) {
-        return fs.readdir(modulesPath, function (err, files) {
-            if (err) return modulesCb(err);
-            return async.eachSeries(files, function (file, eachCb) {
-                var newPath = path.join(modulesPath, file);
-                return fs.stat(newPath, function (err, stats) {
-                    if (err) eachCb(err);
+        var files = fs.readdirSync(modulesPath);
+        return async.eachSeries(files, function (file, eachCb) {
+            var newPath = path.join(modulesPath, file);
+            var stats = fs.statSync(newPath);
 
-                    if (!stats.isDirectory()) {
-                        return eachCb();
-                    }
+            if (!stats.isDirectory()) {
+                return eachCb();
+            }
 
-                    var mixinPath = path.join("..", "modules", file);
-                    return crawlModuleDir(newPath, mixinPath, eachCb);
-                });
-
-            }, modulesCb);
-        });
+            var mixinPath = path.join("..", "modules", file);
+            return crawlModuleDir(newPath, mixinPath, eachCb);
+        }, modulesCb);
     }
 
     function crawlModuleDir(modulePath, mixinPath, moduleCb) {
-        return fs.readdir(modulePath, function (err, files) {
-            if (err) return moduleCb(err);
-            return async.eachSeries(files, function (file, eachCb) {
-                var newPath = path.join(modulePath, file);
-                return fs.stat(newPath, function (err, stats) {
-                    if (err) return eachCb(err);
+        var files = fs.readdirSync(modulePath);
+        return async.eachSeries(files, function (file, eachCb) {
+            var newPath = path.join(modulePath, file);
+            var stats = fs.statSync(newPath);
+            if (!stats.isDirectory()) {
+                return eachCb();
+            }
 
-                    if (!stats.isDirectory()) {
-                        return eachCb();
-                    }
+            var newMixinPath = path.join(mixinPath, file);
 
-                    var newMixinPath = path.join(mixinPath, file);
-
-                    // Handlers
-                    if (file === "server") {
-                        return serverHandler(newPath, newMixinPath, eachCb);
-                    } else if(file === "common") {
-                        return commonHandler(newPath, eachCb);
-                    }
+            // Handlers
+            if (file === "server") {
+                return serverHandler(newPath, newMixinPath, eachCb);
+            } else if (file === "common") {
+                return commonHandler(newPath, eachCb);
+            }
 
 
-                    return eachCb();
-                });
-            }, moduleCb);
-        });
+            return eachCb();
+        }, moduleCb);
     }
 
     function serverHandler(serverPath, mixinPath, serverCb) {
-        return fs.readdir(serverPath, function (err, files) {
-            if (err) return serverCb(err);
-            return async.eachSeries(files, function (file, eachCb) {
-                var newPath = path.join(serverPath, file);
-                return fs.stat(newPath, function (err, stats) {
-                    if (err) return eachCb(err);
+        var files = fs.readdirSync(serverPath);
+        return async.eachSeries(files, function (file, eachCb) {
+            var newPath = path.join(serverPath, file);
+            var stats = fs.statSync(newPath);
+            if (!stats.isDirectory()) {
+                return eachCb();
+            }
 
-                    if (!stats.isDirectory()) {
-                        return eachCb();
-                    }
+            // Handlers
+            if (file === "boot") {
+                bootHandler(newPath);
+            } else if (file === "mixins") {
+                var newMixinPath = path.join(mixinPath, file);
+                return mixinsHandler(newPath, newMixinPath, eachCb);
+            }
 
-
-                    // Handlers
-                    if (file === "boot") {
-                        bootHandler(newPath);
-                    } else if(file === "mixins") {
-                        var newMixinPath = path.join(mixinPath, file);
-                        return mixinsHandler(newPath, newMixinPath, eachCb);
-                    }
-
-                    return eachCb();
-                });
-            }, serverCb);
-        });
+            return eachCb();
+        }, serverCb);
     }
 
     function bootHandler(bootPath) {
@@ -135,48 +121,38 @@ function generateBootOptions(app, options, finalCb) {
     }
 
     function mixinsHandler(bootPath, mixinPath, finalCb) {
-        return fs.readdir(bootPath, function (err, files) {
-            if (err) return finalCb(err);
-            return async.eachSeries(files, function (file, eachCb) {
-                var newPath = path.join(bootPath, file);
-                return fs.stat(newPath, function (err, stats) {
-                    if (err) return eachCb(err);
+        var files = fs.readdirSync(bootPath);
+        return async.eachSeries(files, function (file, eachCb) {
+            var newPath = path.join(bootPath, file);
+            var stats = fs.statSync(newPath);
+            if (!stats.isDirectory()) {
+                return eachCb();
+            }
 
-                    if (!stats.isDirectory()) {
-                        return eachCb();
-                    }
+            var newMixinPath = path.join(mixinPath, file);
+            loopbackBootOptions.mixinSources.push(newMixinPath);
 
-                    var newMixinPath = path.join(mixinPath, file);
-                    loopbackBootOptions.mixinSources.push(newMixinPath);
-
-                    return eachCb();
-                });
-            }, finalCb);
-        });
+            return eachCb();
+        }, finalCb);
     }
 
 
     function commonHandler(commonPath, commonCb) {
-        return fs.readdir(commonPath, function (err, files) {
-            if (err) return commonCb(err);
-            return async.eachSeries(files, function (file, eachCb) {
-                var newPath = path.join(commonPath, file);
-                return fs.stat(newPath, function (err, stats) {
-                    if (err) return eachCb(err);
+        var files = fs.readdirSync(commonPath);
+        return async.eachSeries(files, function (file, eachCb) {
+            var newPath = path.join(commonPath, file);
+            var stats = fs.statSync(newPath);
+            if (!stats.isDirectory()) {
+                return eachCb();
+            }
 
-                    if (!stats.isDirectory()) {
-                        return eachCb();
-                    }
+            // Handlers
+            if (file === "models") {
+                return modelHandler(newPath, eachCb);
+            }
 
-                    // Handlers
-                    if (file === "models") {
-                        return modelHandler(newPath, eachCb);
-                    }
-
-                    return eachCb();
-                });
-            }, commonCb);
-        });
+            return eachCb();
+        }, commonCb);
     }
 
     function modelHandler(modelSourcePath, finalCb) {
@@ -186,5 +162,5 @@ function generateBootOptions(app, options, finalCb) {
 }
 
 module.exports = {
-    generateBootOptions : generateBootOptions
+    generateBootOptions: generateBootOptions
 };
