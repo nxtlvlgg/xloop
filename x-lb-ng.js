@@ -20,9 +20,10 @@ app.on('booted', runGenerator);
 function runGenerator() {
     var ngModuleName = 'lbServices';
     var apiUrl = app.get('restApiRoot') || '/api';
+    var authHeader = 'X-Access-Token';
 
     console.error('Generating %j for the API endpoint %j', ngModuleName, apiUrl);
-    var result = generator.services(app, ngModuleName, apiUrl);
+    var result = generator.services(app, ngModuleName, apiUrl, authHeader);
 
     // Ensure director
     return mkdirp(outputDir, function (err) {
