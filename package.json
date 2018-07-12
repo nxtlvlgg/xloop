@@ -1,6 +1,6 @@
 {
   "name": "xloop",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -18,7 +18,7 @@
   "homepage": "https://github.com/nxtlvlgg/xloop#readme",
   "dependencies": {
     "async": "^2.0.0-rc.2",
-    "loopback": "^2.27.0",
-    "loopback-context": "^1.0.0"
+    "loopback": "2.35.0",
+    "loopback-context": "1.0.0"
   }
 }
